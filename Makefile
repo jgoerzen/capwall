@@ -1,3 +1,5 @@
 all: capwall
-capwall: capwall.c
-	gcc -Wall -o capwall capwall.c -lutil
+CFLAGS ?= -Wall
+
+capwall: capwall.o
+	$(CC) -o capwall capwall.o -lutil

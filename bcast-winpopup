@@ -1,0 +1,40 @@
+#!/usr/bin/python2.2
+
+import os, re, sys
+
+def getsmbmachines():
+    starting = 0
+    retval = {}
+    fd = os.popen("smbstatus -S")
+    for line in fd.xreadlines():
+        line = line.strip()
+        if not len(line):
+            continue
+        if not starting:
+            if line.startswith('-----'):
+                starting = 1
+            continue
+        service, uid, gid, pid, machine = \
+                 re.search('^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)', line).groups()
+        retval[machine] = 1
+        
+    return retval.keys()
+
+print "Reading message (if at keyboard, type it, then hit Ctrl-D).."
+message = sys.stdin.read()
+
+sys.stdout.write("Getting a list of machines... ")
+sys.stdout.flush()
+machines = getsmbmachines()
+machines.sort()
+transmitted = 0
+count = len(machines)
+
+print count
+
+for machine in ['transfax2']:
+    transmitted += 1
+    print "Sending message %-3d of %-3d to %s" % (transmitted, count, machine)
+    fd = os.popen("smbclient -M %s" % machine, "w")
+    fd.write(message)
+    fd.close()
