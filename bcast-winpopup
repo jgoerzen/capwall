@@ -22,7 +22,9 @@ def getsmbmachines():
 
 print "Reading message (if at keyboard, type it, then hit Ctrl-D).."
 message = sys.stdin.read()
-
+print len(message)
+message = message.strip()
+message = re.sub("\n", "", message)
 sys.stdout.write("Getting a list of machines... ")
 sys.stdout.flush()
 machines = getsmbmachines()

@@ -65,11 +65,11 @@ int main(int argc, char *argv[]) {
   int masterfd, slavefd;
   char ptyname[1024];
   char buffer[10240];
-  int count;
+  int count, argcount;
   FILE *dest;
 
   if (! (argc > 1)) {
-    printf("Syntax: capwall command\n");
+    printf("Syntax: capwall command [command...]\n");
     exit(1);
   }
   
@@ -86,12 +86,14 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     getmessage(masterfd, buffer, sizeof(buffer), &count);
-    dest = popen(argv[1], "w");
-    if (!dest) {
-      continue;
+    for (argcount = 1; argcount < argc; argcount++) {
+      dest = popen(argv[argcount], "w");
+      if (!dest) {
+	continue;
+      }
+      fwrite(buffer, count, 1,  dest);
+      pclose(dest);
     }
-    fwrite(buffer, count, 1,  dest);
-    pclose(dest);
 
   }
   return 0;
